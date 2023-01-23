@@ -1,48 +1,3 @@
-//
-//  ContentView.swift
-//  TimeZoneSlider
-//
-//  Created by Silas Yeak on 1/12/23.
-//
-
-
-
-/*
- import SwiftUI
- 
- struct ContentView: View {
- @State private var selectedTimeZone = TimeZone.current.identifier
- 
- var body: some View {
- VStack {
- Picker("Select a time zone", selection: $selectedTimeZone) {
- ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { timeZone in
- Text(TimeZone(identifier: timeZone)?.localizedName(for: .standard, locale: Locale.current) ?? "")
- }
- }
- Text("\(getTime(timeZone: selectedTimeZone))")
- .font(.largeTitle)
- .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
- self.selectedTimeZone = self.selectedTimeZone
- }
- 
- 
- }
- }
- func getTime(timeZone: String) -> String {
- let date = Date()
- let formatter = DateFormatter()
- formatter.timeZone = TimeZone(identifier: timeZone)
- formatter.dateFormat = "HH:mm:ss"
- return formatter.string(from: date)
- }
- }
- */
-
-
-
-
-
 import SwiftUI
 
 struct ContentView: View {
@@ -56,6 +11,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
+            //picker to select the first city
             Picker("Select a city", selection: $selectedCity) {
                 ForEach(cities.keys.sorted(), id: \.self) { key in
                     Text(key)
@@ -63,12 +19,13 @@ struct ContentView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             
+            //displays the current time for the selected city
             Text("\(getTime(timeZoneOffset: cities[selectedCity]!))")
                 .font(.largeTitle)
                 .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
                     self.selectedCity = self.selectedCity
                 }
-            //Slider(value: $sliderValue, in: -12 ... 12, step: 0.1)
+            //slider to adjust the timer offset
             HStack {
                 
                 Slider(value: $sliderValue, in: -12 ... 12, step: 0.1)
@@ -79,10 +36,10 @@ struct ContentView: View {
             }
             
             
-            //I think just have the slider add to the hours then just + whatever value, maybe make it constant
+            //Displays the time offset for the first selected city
             Text("1st: \(getOffsetTime(sliderValue: sliderValue, timeZoneOffset: cities[selectedCity]!))")
             
-            
+            //picker to select the second city
             Picker("Select a city", selection: $selectedCity2) {
                 ForEach(cities.keys.sorted(), id: \.self) { key in
                     Text(key)
@@ -90,22 +47,26 @@ struct ContentView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             
+            //Displays the current time for the selected city
             Text("\(getTime(timeZoneOffset: cities[selectedCity2]!))")
                 .font(.largeTitle)
                 .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
                     self.selectedCity2 = self.selectedCity2
                 }
+            //Slider to adjust the time offset
             HStack {
-                
                 Slider(value: $sliderValue, in: -12 ... 12, step: 0.1)
+                //Text field to display the current offset value
                 TextField("", value: $sliderValue, formatter: NumberFormatter())
                     .frame(width: 50)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .keyboardType(.decimalPad)
             }
+            //Displays the time offset for the second selected city
             Text("2nd: \(getOffsetTime(sliderValue: sliderValue, timeZoneOffset: cities[selectedCity2]!))")
         }
     }
+    //This function gets the current time for the selected city
     func getTime(timeZoneOffset: String) -> String {
         let date = Date()
         let formatter = DateFormatter()
@@ -113,7 +74,7 @@ struct ContentView: View {
         formatter.dateFormat = "[MM/dd] hh:mm a"
         return formatter.string(from: date)
     }
-    //figure this out later
+    //offsetDate is the current time with the offset value added to it
     func getOffsetTime(sliderValue: Double, timeZoneOffset: String) -> String {
         let date = Date()
         let formatter = DateFormatter()
@@ -122,82 +83,4 @@ struct ContentView: View {
         let offsetDate = date.addingTimeInterval(sliderValue * 3600)
         return formatter.string(from: offsetDate)
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
-
-/*
- 
- import SwiftUI
- 
- struct ContentView: View {
- @State private var sliderValue = 0.0
- @State private var selectedCity = "New York"
- let cities = ["New York": "America/New_York", "Paris": "Europe/Paris", "Tokyo": "Asia/Tokyo", "Sydney": "Australia/Sydney"]
- 
- //let cities = ["PST": "PST", "EST": "EST", "Singapore": "Asia/Singapore", "Guam": "Pacific/Guam"]
- @State private var selectedTimeZone = TimeZone.knownTimeZoneIdentifiers
- 
- var body: some View {
- VStack {
- 
- 
- Picker("Select a city", selection: $selectedCity) {
- ForEach(cities.keys.sorted(), id: \.self) { key in
- Text(key)
- }
- }
- .pickerStyle(SegmentedPickerStyle())
- /*
-  Picker("Select a time zone", selection: $selectedTimeZone) {
-  //figure out a sorting & searching method for this
-  ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { timeZone in
-  Text(TimeZone(identifier: timeZone)?.localizedName(for: .standard, locale: Locale.current) ?? "")
-  }
-  }
-  */
- 
- Text("\(getTime(timeZone: selectedTimeZone, offsetValue: sliderValue))")
- .font(.largeTitle)
- .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
- self.selectedTimeZone = self.selectedTimeZone
- }
- /*
-  Picker("Select a time zone", selection: $selectedTimeZone2) {
-  ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { timeZone in
-  Text(TimeZone(identifier: timeZone)?.localizedName(for: .standard, locale: Locale.current) ?? "")
-  }
-  }
-  */
- Slider(value: $sliderValue, in: -12 ... 12, step: 0.1)
- 
- Text("\(getTime(timeZone: selectedTimeZone, offsetValue : sliderValue))")
- 
- 
- 
- }
- 
- }
- 
- func getTime(timeZone: String, offsetValue : Double) -> String {
- let date = Date()
- let formatter = DateFormatter()
- formatter.timeZone = TimeZone(identifier: timeZone)
- formatter.dateFormat = "HH:mm:ss"
- let offset = String(format: "%.1f", offsetValue) // format the offset value as a double with 1 decimal place
- return formatter.string(from: date) + " (\(offsetValue >= 0 ? "+" : "")\(offset))"
- }
- 
- 
- 
- 
- }
- */
-
